@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Frase de emergencia</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 50px;
+    }
+    #resultado {
+      font-size: 32px;
+      margin: 20px 0;
+    }
+    button {
+      font-size: 24px;
+      padding: 10px 20px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Frase de emergencia</h1>
+  <div id="resultado">🐼</div>
+  <button onclick="mostrarFrase()">Mostrar Frase</button>
+
+  <script>
+    const frases = [
+      "te amo 💖",
+      "te extraño 💗",
+      "wiiiii 💞",
+      "apapacho a la distancia 💕",
+      "bu 🤍",
+      "ti amo ❤️",
+      "que facha eh",
+      "iba a bajar la intensidad pero termine haciendo esto",
+      "fuerza con la tesis, vos podes",
+      "💜🤝💙"
+    ];
+    
+    let contador = 0; // Contador de clics
+
+    function mostrarFrase() {
+      if (contador < 10) {
+        const indice = Math.floor(Math.random() * frases.length);
+        document.getElementById("resultado").textContent = "Amoooor " + frases[indice];
+        contador++;
+      } else {
+        document.getElementById("resultado").textContent = "Si aparece este mensaje es porque apretaste el boton 10 veces! Mandame un sticker de stitch por whatsapp";
+        contador = 0; // Resetear contador para volver a las frases aleatorias
+      }
+    }
+  </script>
+</body>
+</html>
