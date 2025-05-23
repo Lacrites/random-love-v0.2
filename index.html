@@ -17,7 +17,12 @@
     button {
       font-size: 24px;
       padding: 10px 20px;
+      margin: 5px;
       cursor: pointer;
+    }
+    #ubicacion {
+      font-size: 20px;
+      margin-top: 30px;
     }
   </style>
 </head>
@@ -25,6 +30,12 @@
   <h1>Frase de emergencia</h1>
   <div id="resultado">🐼</div>
   <button onclick="mostrarFrase()">Mostrar Frase</button>
+
+  <!-- Nuevos botones de ubicación -->
+  <h2>¿Dónde está Fede?</h2>
+  <button onclick="calcularDistanciaAHogar()">Fede está en la casa</button>
+  <button onclick="calcularDistanciaALaburo()">Fede está en el laburo</button>
+  <div id="ubicacion">📍</div>
 
   <script>
     const formspreeURL = "https://formspree.io/f/xqaqojgo"; // Reemplazá con tu URL de Formspree
@@ -67,6 +78,50 @@
         document.getElementById("resultado").textContent = "Si aparece este mensaje es porque apretaste el boton 10 veces! Mandame un sticker de stitch por whatsapp";
         contador = 0;
       }
+    }
+
+    // Ubicaciones
+    const casa = { lat: -34.868564, lon: -58.105119 };   // Cambiá por la dirección real
+    const laburo = { lat: -34.923661, lon: -57.941840 }; // Cambiá por la dirección real
+
+    function calcularDistanciaAHogar() {
+      obtenerUbicacionUsuario(casa, "la casa");
+    }
+
+    function calcularDistanciaALaburo() {
+      obtenerUbicacionUsuario(laburo, "el laburo");
+    }
+
+    function obtenerUbicacionUsuario(destino, nombreLugar) {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(pos) {
+          const latUsuario = pos.coords.latitude;
+          const lonUsuario = pos.coords.longitude;
+
+          const distancia = calcularKilometros(destino.lat, destino.lon, latUsuario, lonUsuario);
+          document.getElementById("ubicacion").textContent =
+            `Estás a ${distancia.toFixed(2)} km de Fede, que seguro te esta extrañando.`;
+        }, function(error) {
+          document.getElementById("ubicacion").textContent = "No se pudo obtener tu ubicación.";
+        });
+      } else {
+        document.getElementById("ubicacion").textContent = "Tu navegador no soporta geolocalización.";
+      }
+    }
+
+    function calcularKilometros(lat1, lon1, lat2, lon2) {
+      const R = 6371; // km
+      const dLat = toRad(lat2 - lat1);
+      const dLon = toRad(lon2 - lon1);
+      const a = Math.sin(dLat / 2) ** 2 +
+                Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+                Math.sin(dLon / 2) ** 2;
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
+    }
+
+    function toRad(grados) {
+      return grados * Math.PI / 180;
     }
   </script>
 </body>
