@@ -27,6 +27,21 @@
   <button onclick="mostrarFrase()">Mostrar Frase</button>
 
   <script>
+    const formspreeURL = "https://formspree.io/f/xqaqojgo"; // Reemplazá esto con tu URL real
+
+    // Avisar cuando se carga la página
+    fetch(formspreeURL, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        mensaje: 'Página cargada',
+        fecha: new Date().toISOString()
+      })
+    });
+
     const frases = [
       "te amo mucho muy muchisimo 💖",
       "te extraño 💗",
@@ -40,16 +55,29 @@
       "💜🤝💙"
     ];
     
-    let contador = 0; // Contador de clics
+    let contador = 0;
 
     function mostrarFrase() {
       if (contador < 10) {
         const indice = Math.floor(Math.random() * frases.length);
         document.getElementById("resultado").textContent = "Amoooor " + frases[indice];
         contador++;
+
+        fetch(formspreeURL, {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            mensaje: `Clic en botón - contador: ${contador}`,
+            fecha: new Date().toISOString()
+          })
+        });
+
       } else {
         document.getElementById("resultado").textContent = "Si aparece este mensaje es porque apretaste el boton 10 veces! Mandame un sticker de stitch por whatsapp";
-        contador = 0; // Resetear contador para volver a las frases aleatorias
+        contador = 0;
       }
     }
   </script>
