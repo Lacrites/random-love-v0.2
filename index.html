@@ -27,9 +27,9 @@
   <button onclick="mostrarFrase()">Mostrar Frase</button>
 
   <script>
-    const formspreeURL = "https://formspree.io/f/xqaqojgo"; // Reemplazá esto con tu URL real
+    const formspreeURL = "https://formspree.io/f/xqaqojgo"; // Reemplazá con tu URL de Formspree
 
-    // Avisar cuando se carga la página
+    // Enviar aviso solo al cargar la página
     fetch(formspreeURL, {
       method: 'POST',
       headers: {
@@ -37,7 +37,7 @@
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        mensaje: 'Página cargada',
+        mensaje: 'Alguien abrió la página',
         fecha: new Date().toISOString()
       })
     });
@@ -54,7 +54,7 @@
       "fuerza con la tesis, vos podes 💗",
       "💜🤝💙"
     ];
-    
+
     let contador = 0;
 
     function mostrarFrase() {
@@ -62,19 +62,6 @@
         const indice = Math.floor(Math.random() * frases.length);
         document.getElementById("resultado").textContent = "Amoooor " + frases[indice];
         contador++;
-
-        fetch(formspreeURL, {
-          method: 'POST',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            mensaje: `Clic en botón - contador: ${contador}`,
-            fecha: new Date().toISOString()
-          })
-        });
-
       } else {
         document.getElementById("resultado").textContent = "Si aparece este mensaje es porque apretaste el boton 10 veces! Mandame un sticker de stitch por whatsapp";
         contador = 0;
