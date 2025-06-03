@@ -31,13 +31,28 @@
   <div id="resultado">🐼</div>
   <button onclick="mostrarFrase()">Mostrar Frase</button>
 
-  <!-- Nuevos botones de ubicación -->
   <h2>¿Dónde está Fede?</h2>
-  <button onclick="calcularDistanciaAHogar()">Fede está en la casa</button>
-  <button onclick="calcularDistanciaALaburo()">Fede está en el laburo</button>
+  <button onclick="consultarDistanciaAFede()">Consultar ubicación en vivo</button>
   <div id="ubicacion">📍</div>
 
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
   <script>
+    // ⚠️ Reemplazá con los datos reales de tu proyecto Firebase
+    const firebaseConfig = {
+      apiKey: "TU_API_KEY",
+      authDomain: "TU_DOMINIO.firebaseapp.com",
+      databaseURL: "https://TU_DOMINIO.firebaseio.com",
+      projectId: "TU_PROJECT_ID",
+      storageBucket: "TU_BUCKET.appspot.com",
+      messagingSenderId: "TU_MESSAGING_ID",
+      appId: "TU_APP_ID"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
     const frases = [
       "te amo mucho muy muchisimo 💖",
       "te extraño 💗",
@@ -49,7 +64,7 @@
       ", iba a bajar la intensidad, pero me dijiste que asi te gusto",
       "felicidades por recibirte, te lo super mereces💗",
       "💜🤝💙",
-      "hoy te amo mas que ayer y menos que mañana 💗"
+      "hoy te amo más que ayer y menos que mañana 💗"
     ];
 
     let contador = 0;
@@ -60,42 +75,41 @@
         document.getElementById("resultado").textContent = "Amoooor " + frases[indice];
         contador++;
       } else {
-        document.getElementById("resultado").textContent = "Si aparece este mensaje es porque apretaste el boton 10 veces! Mandame un sticker de stitch por whatsapp";
+        document.getElementById("resultado").textContent = "Si aparece este mensaje es porque apretaste el botón 10 veces! Mandame un sticker de Stitch por WhatsApp.";
         contador = 0;
       }
     }
 
-    // Ubicaciones
-    const casa = { lat: -34.868564, lon: -58.105119 };   // Cambiá por la dirección real
-    const laburo = { lat: -34.923661, lon: -57.941840 }; // Cambiá por la dirección real
+    function consultarDistanciaAFede() {
+      const ref = db.ref("fede/ubicacion");
+      ref.once("value").then(snapshot => {
+        const ubicacionFede = snapshot.val();
+        if (!ubicacionFede) {
+          document.getElementById("ubicacion").textContent = "No hay ubicación registrada de Fede.";
+          return;
+        }
 
-    function calcularDistanciaAHogar() {
-      obtenerUbicacionUsuario(casa, "la casa");
-    }
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(function(pos) {
+            const latUsuario = pos.coords.latitude;
+            const lonUsuario = pos.coords.longitude;
+            const latFede = ubicacionFede.lat;
+            const lonFede = ubicacionFede.lon;
 
-    function calcularDistanciaALaburo() {
-      obtenerUbicacionUsuario(laburo, "el laburo");
-    }
-
-    function obtenerUbicacionUsuario(destino, nombreLugar) {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function(pos) {
-          const latUsuario = pos.coords.latitude;
-          const lonUsuario = pos.coords.longitude;
-
-          const distancia = calcularKilometros(destino.lat, destino.lon, latUsuario, lonUsuario);
-          document.getElementById("ubicacion").textContent =
-            `Estás a ${distancia.toFixed(2)} km de Fede, que seguro te esta extrañando.`;
-        }, function(error) {
-          document.getElementById("ubicacion").textContent = "No se pudo obtener tu ubicación.";
-        });
-      } else {
-        document.getElementById("ubicacion").textContent = "Tu navegador no soporta geolocalización.";
-      }
+            const distancia = calcularKilometros(latUsuario, lonUsuario, latFede, lonFede);
+            document.getElementById("ubicacion").textContent =
+              `Fede está a ${distancia.toFixed(2)} km de vos ❤️`;
+          }, function() {
+            document.getElementById("ubicacion").textContent = "No se pudo obtener tu ubicación.";
+          });
+        } else {
+          document.getElementById("ubicacion").textContent = "Tu navegador no soporta geolocalización.";
+        }
+      });
     }
 
     function calcularKilometros(lat1, lon1, lat2, lon2) {
-      const R = 6371; // km
+      const R = 6371;
       const dLat = toRad(lat2 - lat1);
       const dLon = toRad(lon2 - lon1);
       const a = Math.sin(dLat / 2) ** 2 +
