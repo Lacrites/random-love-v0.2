@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Frase de emergencia</title>
-  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap" rel="stylesheet" />
   <style>
     body {
       font-family: 'Quicksand', sans-serif;
@@ -81,6 +81,7 @@
       opacity: 0;
       transition: opacity 0.6s ease;
       pointer-events: none;
+      user-select: none;
     }
 
     #mensajeJuego {
@@ -118,14 +119,14 @@
 <body>
   <h1>Frase de emergencia 💌</h1>
   <div id="resultado">🐼</div>
-  <br>
+  <br />
   <button onclick="mostrarFrase()">Mostrar Frase</button>
 
   <div id="juego-sorpresa">
     <h2>📸 Foto sorpresa</h2>
-    <div class="caja"><img alt="Foto sorpresa 1"></div>
-    <div class="caja"><img alt="Foto sorpresa 2"></div>
-    <div class="caja"><img alt="Foto sorpresa 3"></div>
+    <div class="caja"><img alt="Foto sorpresa 1" /></div>
+    <div class="caja"><img alt="Foto sorpresa 2" /></div>
+    <div class="caja"><img alt="Foto sorpresa 3" /></div>
     <div id="mensajeJuego">Elegí una cajita para ver tu sorpresa 🎁</div>
     <button id="volverBtn" onclick="volverAFrases()">Volver a frases</button>
   </div>
@@ -142,7 +143,7 @@
       ", iba a bajar la intensidad, pero me dijiste que así te gusto",
       "felicidades por recibirte, te lo super mereces 💗",
       "💜🤝💙",
-      "hoy te amo más que ayer y menos que mañana 💗"
+      "hoy te amo más que ayer y menos que mañana 💗",
     ];
 
     let contador = 0;
@@ -188,11 +189,11 @@
       mensajeJuego.textContent = "Elegí una cajita para ver tu sorpresa 🎁";
       volverBtn.style.display = "none";
 
-      // Crear una lista de 15 posibles imágenes
-      const disponibles = Array.from({length: 15}, (_, i) => `foto${i + 1}.jpg`);
-
-      // Barajar y tomar 3 al azar
+      const disponibles = Array.from({ length: 15 }, (_, i) => `foto${i + 1}.jpg`);
       const seleccionadas = disponibles.sort(() => 0.5 - Math.random()).slice(0, 3);
+
+      // Contador de imágenes reveladas
+      let reveladas = 0;
 
       cajas.forEach((caja, i) => {
         const img = caja.querySelector("img");
@@ -200,23 +201,21 @@
         img.style.opacity = 0;
 
         caja.onclick = function () {
-          mostrarFoto(caja);
+          if (img.style.opacity === "1") return; // Ya revelada, no hacer nada
+
+          img.style.opacity = 1;
+          reveladas++;
+
+          const mensajeJuego = document.getElementById("mensajeJuego");
+          mensajeJuego.textContent = `¡Sorpresa ${reveladas} desbloqueada${reveladas === 1 ? '' : 's'}! 💖`;
+
+          // Si se revelaron las 3, mostrar botón volver
+          if (reveladas === 3) {
+            document.getElementById("volverBtn").style.display = "inline-block";
+            mensajeJuego.textContent = "¡Has visto todas las sorpresas! 🎉";
+          }
         };
       });
-    }
-
-    function mostrarFoto(caja) {
-      const img = caja.querySelector("img");
-      img.style.opacity = 1;
-
-      const mensajeJuego = document.getElementById("mensajeJuego");
-      mensajeJuego.textContent = "¡Sorpresa desbloqueada! 💖";
-
-      // Deshabilitar más clics
-      document.querySelectorAll(".caja").forEach(c => c.onclick = null);
-
-      // Mostrar botón volver
-      document.getElementById("volverBtn").style.display = "inline-block";
     }
 
     function volverAFrases() {
