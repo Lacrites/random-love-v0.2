@@ -78,7 +78,9 @@
       height: 100%;
       object-fit: cover;
       border-radius: 13px;
-      display: none;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+      pointer-events: none;
     }
 
     #mensajeJuego {
@@ -121,9 +123,9 @@
 
   <div id="juego-sorpresa">
     <h2>📸 Foto sorpresa</h2>
-    <div class="caja" onclick="mostrarFoto(this, 0)"><img src="foto1.jpg" alt="Foto 1"></div>
-    <div class="caja" onclick="mostrarFoto(this, 1)"><img src="foto2.jpg" alt="Foto 2"></div>
-    <div class="caja" onclick="mostrarFoto(this, 2)"><img src="foto3.jpg" alt="Foto 3"></div>
+    <div class="caja"><img alt="Foto sorpresa 1"></div>
+    <div class="caja"><img alt="Foto sorpresa 2"></div>
+    <div class="caja"><img alt="Foto sorpresa 3"></div>
     <div id="mensajeJuego">Elegí una cajita para ver tu sorpresa 🎁</div>
     <button id="volverBtn" onclick="volverAFrases()">Volver a frases</button>
   </div>
@@ -186,9 +188,17 @@
       mensajeJuego.textContent = "Elegí una cajita para ver tu sorpresa 🎁";
       volverBtn.style.display = "none";
 
-      cajas.forEach(caja => {
+      // Crear una lista de 15 posibles imágenes
+      const disponibles = Array.from({length: 15}, (_, i) => `foto${i + 1}.jpg`);
+
+      // Barajar y tomar 3 al azar
+      const seleccionadas = disponibles.sort(() => 0.5 - Math.random()).slice(0, 3);
+
+      cajas.forEach((caja, i) => {
         const img = caja.querySelector("img");
-        img.style.display = "none";
+        img.src = seleccionadas[i];
+        img.style.opacity = 0;
+
         caja.onclick = function () {
           mostrarFoto(caja);
         };
@@ -197,7 +207,7 @@
 
     function mostrarFoto(caja) {
       const img = caja.querySelector("img");
-      img.style.display = "block";
+      img.style.opacity = 1;
 
       const mensajeJuego = document.getElementById("mensajeJuego");
       mensajeJuego.textContent = "¡Sorpresa desbloqueada! 💖";
