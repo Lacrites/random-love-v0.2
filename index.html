@@ -50,6 +50,46 @@
       transform: scale(1.05);
     }
 
+    #juego-sorpresa {
+      display: none;
+      margin-top: 30px;
+    }
+
+    .caja {
+      display: inline-block;
+      width: 100px;
+      height: 100px;
+      background-color: #ffe4ec;
+      border-radius: 12px;
+      margin: 10px;
+      cursor: pointer;
+      position: relative;
+      transition: transform 0.2s ease;
+    }
+
+    .caja:hover {
+      transform: scale(1.05);
+    }
+
+    .caja img {
+      width: 100%;
+      height: 100%;
+      border-radius: 12px;
+      object-fit: cover;
+      display: none;
+    }
+
+    #mensajeJuego {
+      margin-top: 20px;
+      font-size: 24px;
+      color: #b03060;
+    }
+
+    #volverBtn {
+      display: none;
+      margin-top: 20px;
+    }
+
     @media (max-width: 600px) {
       h1 {
         font-size: 28px;
@@ -72,6 +112,15 @@
   <br>
   <button onclick="mostrarFrase()">Mostrar Frase</button>
 
+  <div id="juego-sorpresa">
+    <h2>📸 Foto sorpresa</h2>
+    <div class="caja" onclick="mostrarFoto(this, 0)"><img src="foto1.jpg" alt="Foto 1"></div>
+    <div class="caja" onclick="mostrarFoto(this, 1)"><img src="foto2.jpg" alt="Foto 2"></div>
+    <div class="caja" onclick="mostrarFoto(this, 2)"><img src="foto3.jpg" alt="Foto 3"></div>
+    <div id="mensajeJuego">Elegí una cajita para ver tu sorpresa 🎁</div>
+    <button id="volverBtn" onclick="volverAFrases()">Volver a frases</button>
+  </div>
+
   <script>
     const frases = [
       "te amo mucho muy muchisimo 💖",
@@ -92,10 +141,17 @@
 
     function mostrarFrase() {
       const resultado = document.getElementById("resultado");
+      const juego = document.getElementById("juego-sorpresa");
+      const mensajeJuego = document.getElementById("mensajeJuego");
+      const volverBtn = document.getElementById("volverBtn");
+      juego.style.display = "none";
+      mensajeJuego.textContent = "";
+      volverBtn.style.display = "none";
+
       resultado.style.opacity = 0;
 
       setTimeout(() => {
-        if (contador < 10) {
+        if (contador < 9) {
           let indice;
           do {
             indice = Math.floor(Math.random() * frases.length);
@@ -105,13 +161,52 @@
           resultado.textContent = "Amoooor " + frases[indice];
           contador++;
         } else {
-          resultado.textContent = "Si aparece este mensaje es porque apretaste el botón 10 veces! Mandame un sticker de Stitch por WhatsApp 🐾";
+          resultado.textContent = "¡Minijuego activado! 📸";
+          iniciarFotoSorpresa();
+          juego.style.display = "block";
           contador = 0;
           ultimoIndice = -1;
         }
 
         resultado.style.opacity = 1;
       }, 200);
+    }
+
+    function iniciarFotoSorpresa() {
+      const cajas = document.querySelectorAll(".caja");
+      const mensajeJuego = document.getElementById("mensajeJuego");
+      const volverBtn = document.getElementById("volverBtn");
+      mensajeJuego.textContent = "Elegí una cajita para ver tu sorpresa 🎁";
+      volverBtn.style.display = "none";
+
+      cajas.forEach(caja => {
+        const img = caja.querySelector("img");
+        img.style.display = "none";
+        caja.onclick = function () {
+          mostrarFoto(caja);
+        };
+      });
+    }
+
+    function mostrarFoto(caja) {
+      const img = caja.querySelector("img");
+      img.style.display = "block";
+
+      const mensajeJuego = document.getElementById("mensajeJuego");
+      mensajeJuego.textContent = "¡Sorpresa desbloqueada! 💖";
+
+      // Deshabilitar clics en todas las cajas
+      document.querySelectorAll(".caja").forEach(c => c.onclick = null);
+
+      // Mostrar botón para volver
+      document.getElementById("volverBtn").style.display = "inline-block";
+    }
+
+    function volverAFrases() {
+      document.getElementById("juego-sorpresa").style.display = "none";
+      document.getElementById("mensajeJuego").textContent = "";
+      document.getElementById("volverBtn").style.display = "none";
+      document.getElementById("resultado").textContent = "🐼";
     }
   </script>
 </body>
