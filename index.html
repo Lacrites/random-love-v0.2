@@ -28,6 +28,8 @@
       border-radius: 12px;
       display: inline-block;
       max-width: 80%;
+      transition: opacity 0.4s ease;
+      opacity: 1;
     }
 
     button {
@@ -86,17 +88,30 @@
     ];
 
     let contador = 0;
+    let ultimoIndice = -1;
 
     function mostrarFrase() {
       const resultado = document.getElementById("resultado");
-      if (contador < 10) {
-        const indice = Math.floor(Math.random() * frases.length);
-        resultado.textContent = "Amoooor " + frases[indice];
-        contador++;
-      } else {
-        resultado.textContent = "Si aparece este mensaje es porque apretaste el botón 10 veces! Mandame un sticker de Stitch por WhatsApp 🐾";
-        contador = 0;
-      }
+      resultado.style.opacity = 0;
+
+      setTimeout(() => {
+        if (contador < 10) {
+          let indice;
+          do {
+            indice = Math.floor(Math.random() * frases.length);
+          } while (indice === ultimoIndice);
+          ultimoIndice = indice;
+
+          resultado.textContent = "Amoooor " + frases[indice];
+          contador++;
+        } else {
+          resultado.textContent = "Si aparece este mensaje es porque apretaste el botón 10 veces! Mandame un sticker de Stitch por WhatsApp 🐾";
+          contador = 0;
+          ultimoIndice = -1;
+        }
+
+        resultado.style.opacity = 1;
+      }, 200);
     }
   </script>
 </body>
