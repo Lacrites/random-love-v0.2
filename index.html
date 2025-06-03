@@ -120,7 +120,7 @@
   <h1>Frase de emergencia 💌</h1>
   <div id="resultado">🐼</div>
   <br />
-  <button onclick="mostrarFrase()">Mostrar Frase</button>
+  <button id="mostrarFraseBtn" onclick="mostrarFrase()">Mostrar Frase</button>
 
   <div id="juego-sorpresa">
     <h2>📸 Foto sorpresa</h2>
@@ -154,9 +154,12 @@
       const juego = document.getElementById("juego-sorpresa");
       const mensajeJuego = document.getElementById("mensajeJuego");
       const volverBtn = document.getElementById("volverBtn");
+      const mostrarFraseBtn = document.getElementById("mostrarFraseBtn");
+
       juego.style.display = "none";
       mensajeJuego.textContent = "";
       volverBtn.style.display = "none";
+      mostrarFraseBtn.style.display = "inline-block"; // Aseguramos que esté visible
 
       resultado.style.opacity = 0;
 
@@ -174,6 +177,7 @@
           resultado.textContent = "¡Minijuego activado! 📸";
           iniciarFotoSorpresa();
           juego.style.display = "block";
+          mostrarFraseBtn.style.display = "none"; // Ocultamos el botón mientras está el minijuego
           contador = 0;
           ultimoIndice = -1;
         }
@@ -222,6 +226,7 @@
       document.getElementById("juego-sorpresa").style.display = "none";
       document.getElementById("mensajeJuego").textContent = "";
       document.getElementById("volverBtn").style.display = "none";
+      document.getElementById("mostrarFraseBtn").style.display = "inline-block"; // Mostrar botón de nuevo
       document.getElementById("resultado").textContent = "🐼";
     }
   </script>
