@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Frase de emergencia + Ubicación</title>
+  <title>Frase de emergencia</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -30,32 +30,6 @@
   <h1>Frase de emergencia 💌</h1>
   <div id="resultado">🐼</div>
   <button onclick="mostrarFrase()">Mostrar Frase</button>
-
-  <h2>Compartir ubicación con Fede 📍</h2>
-  <button onclick="enviarUbicacion()">Enviar mi ubicación</button>
-  <button onclick="calcularDistanciaAFede()">Calcular distancia a Fede</button>
-
-  <div id="estado">Esperando acción...</div>
-  <div id="distancia">🔍</div>
-
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
-
-  <script>
-    // Config Firebase
-    const firebaseConfig = {
-      apiKey: "AIzaSyDIH4A_jCkkSY9n6f24SZCm6YX7d4Zc1mA",
-      authDomain: "distancecalclove.firebaseapp.com",
-      databaseURL: "https://distancecalclove-default-rtdb.firebaseio.com",
-      projectId: "distancecalclove",
-      storageBucket: "distancecalclove.appspot.com",
-      messagingSenderId: "939614089857",
-      appId: "1:939614089857:web:9c7db5d70ee8562ec5d380"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
 
     // Frases lindas 💖
     const frases = [
@@ -84,88 +58,6 @@
         resultado.textContent = "Si aparece este mensaje es porque apretaste el botón 10 veces! Mandame un sticker de Stitch por WhatsApp 🐾";
         contador = 0;
       }
-    }
-
-    function enviarUbicacion() {
-      const estado = document.getElementById("estado");
-
-      if (navigator.geolocation) {
-        estado.textContent = "Obteniendo tu ubicación...";
-
-        navigator.geolocation.getCurrentPosition(pos => {
-          const lat = pos.coords.latitude;
-          const lon = pos.coords.longitude;
-
-          db.ref("mica/ubicacion").set({
-            lat: lat,
-            lon: lon,
-            timestamp: new Date().toISOString()
-          }).then(() => {
-            estado.textContent = `Ubicación enviada ✅ (${lat.toFixed(4)}, ${lon.toFixed(4)})`;
-          }).catch(err => {
-            estado.textContent = "Error al enviar ubicación.";
-            console.error(err);
-          });
-
-        }, () => {
-          estado.textContent = "No se pudo obtener tu ubicación.";
-        });
-
-      } else {
-        estado.textContent = "Tu navegador no soporta geolocalización.";
-      }
-    }
-
-    function calcularDistanciaAFede() {
-      const estado = document.getElementById("estado");
-      const distanciaDiv = document.getElementById("distancia");
-
-      if (navigator.geolocation) {
-        estado.textContent = "Obteniendo tu ubicación para calcular distancia...";
-
-        navigator.geolocation.getCurrentPosition(pos => {
-          const lat = pos.coords.latitude;
-          const lon = pos.coords.longitude;
-
-          db.ref("fede/ubicacion").once("value").then(snapshot => {
-            const ubicacionFede = snapshot.val();
-            if (!ubicacionFede) {
-              distanciaDiv.textContent = "Aún no hay ubicación de Fede 🕵️‍♂️";
-              estado.textContent = "No se pudo calcular distancia.";
-              return;
-            }
-
-            const distancia = calcularKilometros(lat, lon, ubicacionFede.lat, ubicacionFede.lon);
-            distanciaDiv.textContent = `Estás a ${distancia.toFixed(2)} km de Fede 💞`;
-            estado.textContent = "Distancia calculada correctamente.";
-          }).catch(err => {
-            distanciaDiv.textContent = "Error al obtener la ubicación de Fede.";
-            estado.textContent = "";
-            console.error(err);
-          });
-
-        }, () => {
-          estado.textContent = "No se pudo obtener tu ubicación.";
-        });
-
-      } else {
-        estado.textContent = "Tu navegador no soporta geolocalización.";
-      }
-    }
-
-    function calcularKilometros(lat1, lon1, lat2, lon2) {
-      const R = 6371; // km
-      const dLat = toRad(lat2 - lat1);
-      const dLon = toRad(lon2 - lon1);
-      const a = Math.sin(dLat / 2) ** 2 +
-                Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-                Math.sin(dLon / 2) ** 2;
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-      return R * c;
-    }
-
-    function toRad(grados) {
-      return grados * Math.PI / 180;
     }
   </script>
 </body>
