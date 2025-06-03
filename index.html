@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Frase de emergencia</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Frase de emergencia + Ubicación</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -17,42 +17,47 @@
     button {
       font-size: 24px;
       padding: 10px 20px;
-      margin: 5px;
+      margin: 10px;
       cursor: pointer;
     }
-    #ubicacion {
+    #estado, #distancia {
       font-size: 20px;
       margin-top: 30px;
     }
   </style>
 </head>
 <body>
-  <h1>Frase de emergencia</h1>
+  <h1>Frase de emergencia 💌</h1>
   <div id="resultado">🐼</div>
   <button onclick="mostrarFrase()">Mostrar Frase</button>
 
-  <h2>¿Dónde está Fede?</h2>
-  <button onclick="consultarDistanciaAFede()">Consultar ubicación en vivo</button>
-  <div id="ubicacion">📍</div>
+  <h2>Compartir ubicación con Fede 📍</h2>
+  <button onclick="enviarUbicacion()">Enviar mi ubicación</button>
+  <button onclick="calcularDistanciaAFede()">Calcular distancia a Fede</button>
 
-  <!-- Firebase -->
+  <div id="estado">Esperando acción...</div>
+  <div id="distancia">🔍</div>
+
+  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+
   <script>
-    // ⚠️ Reemplazá con los datos reales de tu proyecto Firebase
+    // Config Firebase
     const firebaseConfig = {
-      apiKey: "TU_API_KEY",
-      authDomain: "TU_DOMINIO.firebaseapp.com",
-      databaseURL: "https://TU_DOMINIO.firebaseio.com",
-      projectId: "TU_PROJECT_ID",
-      storageBucket: "TU_BUCKET.appspot.com",
-      messagingSenderId: "TU_MESSAGING_ID",
-      appId: "TU_APP_ID"
+      apiKey: "AIzaSyDIH4A_jCkkSY9n6f24SZCm6YX7d4Zc1mA",
+      authDomain: "distancecalclove.firebaseapp.com",
+      databaseURL: "https://distancecalclove-default-rtdb.firebaseio.com",
+      projectId: "distancecalclove",
+      storageBucket: "distancecalclove.appspot.com",
+      messagingSenderId: "939614089857",
+      appId: "1:939614089857:web:9c7db5d70ee8562ec5d380"
     };
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
+    // Frases lindas 💖
     const frases = [
       "te amo mucho muy muchisimo 💖",
       "te extraño 💗",
@@ -61,8 +66,8 @@
       "bu 🤍",
       "ti amo ❤️",
       "que facha eh",
-      ", iba a bajar la intensidad, pero me dijiste que asi te gusto",
-      "felicidades por recibirte, te lo super mereces💗",
+      ", iba a bajar la intensidad, pero me dijiste que así te gusto",
+      "felicidades por recibirte, te lo super mereces 💗",
       "💜🤝💙",
       "hoy te amo más que ayer y menos que mañana 💗"
     ];
@@ -70,46 +75,86 @@
     let contador = 0;
 
     function mostrarFrase() {
+      const resultado = document.getElementById("resultado");
       if (contador < 10) {
         const indice = Math.floor(Math.random() * frases.length);
-        document.getElementById("resultado").textContent = "Amoooor " + frases[indice];
+        resultado.textContent = "Amoooor " + frases[indice];
         contador++;
       } else {
-        document.getElementById("resultado").textContent = "Si aparece este mensaje es porque apretaste el botón 10 veces! Mandame un sticker de Stitch por WhatsApp.";
+        resultado.textContent = "Si aparece este mensaje es porque apretaste el botón 10 veces! Mandame un sticker de Stitch por WhatsApp 🐾";
         contador = 0;
       }
     }
 
-    function consultarDistanciaAFede() {
-      const ref = db.ref("fede/ubicacion");
-      ref.once("value").then(snapshot => {
-        const ubicacionFede = snapshot.val();
-        if (!ubicacionFede) {
-          document.getElementById("ubicacion").textContent = "No hay ubicación registrada de Fede.";
-          return;
-        }
+    function enviarUbicacion() {
+      const estado = document.getElementById("estado");
 
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(function(pos) {
-            const latUsuario = pos.coords.latitude;
-            const lonUsuario = pos.coords.longitude;
-            const latFede = ubicacionFede.lat;
-            const lonFede = ubicacionFede.lon;
+      if (navigator.geolocation) {
+        estado.textContent = "Obteniendo tu ubicación...";
 
-            const distancia = calcularKilometros(latUsuario, lonUsuario, latFede, lonFede);
-            document.getElementById("ubicacion").textContent =
-              `Fede está a ${distancia.toFixed(2)} km de vos ❤️`;
-          }, function() {
-            document.getElementById("ubicacion").textContent = "No se pudo obtener tu ubicación.";
+        navigator.geolocation.getCurrentPosition(pos => {
+          const lat = pos.coords.latitude;
+          const lon = pos.coords.longitude;
+
+          db.ref("mica/ubicacion").set({
+            lat: lat,
+            lon: lon,
+            timestamp: new Date().toISOString()
+          }).then(() => {
+            estado.textContent = `Ubicación enviada ✅ (${lat.toFixed(4)}, ${lon.toFixed(4)})`;
+          }).catch(err => {
+            estado.textContent = "Error al enviar ubicación.";
+            console.error(err);
           });
-        } else {
-          document.getElementById("ubicacion").textContent = "Tu navegador no soporta geolocalización.";
-        }
-      });
+
+        }, () => {
+          estado.textContent = "No se pudo obtener tu ubicación.";
+        });
+
+      } else {
+        estado.textContent = "Tu navegador no soporta geolocalización.";
+      }
+    }
+
+    function calcularDistanciaAFede() {
+      const estado = document.getElementById("estado");
+      const distanciaDiv = document.getElementById("distancia");
+
+      if (navigator.geolocation) {
+        estado.textContent = "Obteniendo tu ubicación para calcular distancia...";
+
+        navigator.geolocation.getCurrentPosition(pos => {
+          const lat = pos.coords.latitude;
+          const lon = pos.coords.longitude;
+
+          db.ref("fede/ubicacion").once("value").then(snapshot => {
+            const ubicacionFede = snapshot.val();
+            if (!ubicacionFede) {
+              distanciaDiv.textContent = "Aún no hay ubicación de Fede 🕵️‍♂️";
+              estado.textContent = "No se pudo calcular distancia.";
+              return;
+            }
+
+            const distancia = calcularKilometros(lat, lon, ubicacionFede.lat, ubicacionFede.lon);
+            distanciaDiv.textContent = `Estás a ${distancia.toFixed(2)} km de Fede 💞`;
+            estado.textContent = "Distancia calculada correctamente.";
+          }).catch(err => {
+            distanciaDiv.textContent = "Error al obtener la ubicación de Fede.";
+            estado.textContent = "";
+            console.error(err);
+          });
+
+        }, () => {
+          estado.textContent = "No se pudo obtener tu ubicación.";
+        });
+
+      } else {
+        estado.textContent = "Tu navegador no soporta geolocalización.";
+      }
     }
 
     function calcularKilometros(lat1, lon1, lat2, lon2) {
-      const R = 6371;
+      const R = 6371; // km
       const dLat = toRad(lat2 - lat1);
       const dLon = toRad(lon2 - lon1);
       const a = Math.sin(dLat / 2) ** 2 +
